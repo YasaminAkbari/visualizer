@@ -22,6 +22,10 @@ def create_visualization(arr, target, width, height, left_color, right_color, mi
     doc.preamble.append(NoEscape(r'\usepackage[a4paper, left=0.5in, top=0.5in]{geometry}'))
 
     with doc.create(Section('Binary Search Visualization')):
+        doc.append(NoEscape(r"""
+        \section*{Introduction}
+        Binary search is an efficient algorithm for finding an item from a sorted list of items. It works by repeatedly dividing in half the portion of the list that could contain the item, until you've narrowed down the possible locations to just one. 
+        """))
         # Define colors
         doc.preamble.append(NoEscape(r'\usepackage{xcolor}'))
         doc.preamble.append(NoEscape(r'\definecolor{leftcolor}{HTML}{%s}' % left_color.lstrip('#')))

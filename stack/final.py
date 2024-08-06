@@ -54,6 +54,10 @@ def create_latex_document(elements, width, item_height, total_items, base_color,
     doc.packages.append(Package('float'))
 
     with doc.create(Section('Stack Operations')):
+        doc.append(NoEscape(r"""
+        \section*{Introduction}
+        In programming and computer science, Stack is one of the important data structures that operate as a "last in, first out" (LIFO) structure. In other words, the last element added to the stack is the first element removed.
+        """))
         doc.append(NoEscape(r'\vspace{1cm}'))
         stack = Stack()
 

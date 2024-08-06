@@ -117,6 +117,10 @@ def create_visualization(arr, width, height, color_map):
         doc.preamble.append(NoEscape(r'\definecolor{%s}{HTML}{%s}' % (color_name, color_code.lstrip('#'))))
 
     with doc.create(Section('Merge Sort Visualization')):
+        doc.append(NoEscape(r"""
+        \section*{Introduction}
+        Merge sort is one of the most efficient sorting algorithms. It works on the principle of Divide and Conquer based on the idea of breaking down a list into several sub-lists until each sublist consists of a single element and merging those sublists in a manner that results into a sorted list.
+        """))
         merge_sort_visualize(arr, width, height, doc, color_map)
     doc.generate_pdf('merge_sort_visualization', clean_tex=False)
 

@@ -10,7 +10,7 @@ class Process:
         self.service_start_time = 0
         self.color = color
 
-def sjn_scheduling_latex(processes, cell_width, cell_height):
+def srt_scheduling_latex(processes, cell_width, cell_height):
     doc = Document()
     doc.packages.append(Package('xcolor'))
     doc.packages.append(Package('tikz'))
@@ -24,51 +24,56 @@ def sjn_scheduling_latex(processes, cell_width, cell_height):
     # محاسبه مقیاس برای اندازه فونت
     font_scale = min(cell_width, cell_height)
 
-    with doc.create(Section('SJN Scheduling')):
+    with doc.create(Section('SRT Scheduling')):
         doc.append(NoEscape(r"""
         \section*{Introduction}
-        The "Shortest-Job-Next" (SJN) algorithm is one of the scheduling algorithms in operating systems designed to manage processes in a multitasking system. In this algorithm, processes that have a shorter execution time are executed earlier than other processes. In other words, SJN tries to prioritize the shortest process to minimize the waiting time of the whole system.
+        Shortest Remaining Time (SRT) scheduling is one of the scheduling algorithms in operating systems that is used to manage processes. This algorithm is an advanced version of the Shortest Job Next (SJN) algorithm. In SRT, the process with the shortest remaining time is executed, and if a new process with a shorter remaining time enters the system, the algorithm switches to that new process.
         """))
         
         time = 0
         completed_processes = []
         execution_order = []
+        process_queue = []
 
         while len(completed_processes) < len(processes):
-            available_processes = [p for p in processes if p.arrival_time <= time and p.remaining_time > 0]
+            # اضافه کردن پردازش‌هایی که در این زمان وارد شده‌اند به صف
+            for process in processes:
+                if process.arrival_time == time:
+                    process_queue.append(process)
 
-            if not available_processes:
-                time += 1
-                continue
+            # پیدا کردن پردازش با کمترین زمان باقی‌مانده
+            if process_queue:
+                current_process = min(process_queue, key=lambda x: x.remaining_time)
+                if current_process.service_start_time == 0:
+                    current_process.service_start_time = time
+                execution_order.append((current_process.name, time, time + 1))
+                current_process.remaining_time -= 1
 
-            current_process = min(available_processes, key=lambda x: x.remaining_time)
-            execution_order.append((current_process.name, time, time + current_process.remaining_time))
-            current_process.service_start_time = time
+                if current_process.remaining_time == 0:
+                    current_process.completion_time = time + 1
+                    process_queue.remove(current_process)
+                    completed_processes.append(current_process)
 
-            with doc.create(Subsection(f'Time {time}: Process {current_process.name}')):
-                draw_process(doc, processes, execution_order, current_process, time, cell_width, cell_height, font_scale)
+                with doc.create(Subsection(f'Time {time}: Process {current_process.name}')):
+                    draw_process(doc, processes, execution_order, current_process, time, cell_width, cell_height, font_scale)
 
-            time += current_process.remaining_time
-            current_process.remaining_time = 0
-            current_process.completion_time = time
-            completed_processes.append(current_process)
-
+            time += 1
 
         # اضافه کردن جدول نهایی در انتهای فایل
         with doc.create(Subsection('Final Process Table')):
             with doc.create(Tabular('|c|c|c|c|')) as table:
                 table.add_hline()
-                table.add_row((NoEscape(r'\textbf{Process}'), NoEscape(r'\textbf{Arrival Time}'), NoEscape(r'\textbf{Burst Time}'), NoEscape(r'\textbf{Service Time}')))
+                table.add_row((NoEscape(r'\textbf{Process}'), NoEscape(r'\textbf{Arrival Time}'), NoEscape(r'\textbf{Burst Time}'), NoEscape(r'\textbf{Completion Time}')))
                 table.add_hline()
                 for process in processes:
-                    table.add_row((process.name, process.arrival_time, process.burst_time, process.service_start_time))
+                    table.add_row((process.name, process.arrival_time, process.burst_time, process.completion_time))
                     table.add_hline()
 
         # رسم آرایه نهایی
         with doc.create(Subsection('Execution Order')):
             draw_execution_order(doc, execution_order, len(processes), cell_width, cell_height, font_scale)
 
-    doc.generate_pdf('sjn_scheduling', clean_tex=False)
+    doc.generate_pdf('srt_scheduling', clean_tex=False)
 
 def draw_process(doc, processes, execution_order, current_process, time, cell_width, cell_height, font_scale, completed=False):
     with doc.create(Figure(position='h!')) as fig:
@@ -121,4 +126,4 @@ def get_dimensions_from_user():
 # دریافت ورودی از کاربر
 processes = get_processes_from_user()
 cell_width, cell_height = get_dimensions_from_user()
-sjn_scheduling_latex(processes, cell_width, cell_height)
+srt_scheduling_latex(processes, cell_width, cell_height)
