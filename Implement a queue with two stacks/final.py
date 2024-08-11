@@ -6,11 +6,10 @@ class QueueWithStacks:
         self.stack1 = []
         self.stack2 = []
         self.doc = Document()
-        # حذف # از کد رنگ
         self.custom_color = custom_color.lstrip('#')
         self.create_document()
-        self.cell_width = 1  # Default width
-        self.cell_height = 1  # Default height
+        self.cell_width = 1  
+        self.cell_height = 1  
 
     def create_document(self):
         self.doc.preamble.append(NoEscape(r'\usepackage{tikz}'))
@@ -18,7 +17,6 @@ class QueueWithStacks:
         self.doc.preamble.append(NoEscape(r'\usepackage[a4paper, left=1in, top=1in]{geometry}'))
         self.doc.preamble.append(NoEscape(rf'\definecolor{{mystackcolor}}{{HTML}}{{{self.custom_color}}}'))
 
-        # اضافه کردن متن مقدمه به ابتدای سند
         self.doc.append(NoEscape(r'''
         \section*{Implementing a Queue Using Two Stacks}
         A queue follows the First In First Out (FIFO) principle, while a stack follows the Last In First Out (LIFO) principle. We aim to mimic the behavior of a queue using two stacks.
@@ -86,26 +84,22 @@ class QueueWithStacks:
     def generate_latex(self, filename="queue_with_stacks.tex"):
         self.doc.generate_tex(filename)
 
-# دریافت ورودی از کاربر
+
 custom_color = input("Please enter the color code for the filled stack cells ( #a9fc8d ): ")
 
 queue = QueueWithStacks(custom_color)
 
-# مرحله اول: دریافت ابعاد خانه‌های استک
 cell_width = float(input("Please enter the width of each stack cell (in cm): "))
 cell_height = float(input("Please enter the height of each stack cell (in cm): "))
 queue.set_cell_dimensions(cell_width, cell_height)
 
-# مرحله دوم: گرفتن مقادیر برای اضافه کردن به صف
 enqueue_values = input("Please enter the values to enqueue (separated by spaces): ")
 values = list(map(int, enqueue_values.split()))
 for value in values:
     queue.enqueue(value)
 
-# مرحله سوم: گرفتن تعداد آیتم‌هایی که باید از صف حذف شوند
 num_dequeue = int(input("Please enter the number of items to dequeue: "))
 for _ in range(num_dequeue):
     queue.dequeue()
 
-# تولید فایل LaTeX
 queue.generate_latex("queue_with_stacks")
